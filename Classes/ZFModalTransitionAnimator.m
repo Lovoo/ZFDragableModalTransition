@@ -161,10 +161,7 @@ void ZFTransitionViewsFromContext(id<UIViewControllerContextTransitioning> trans
         [containerView addSubview:toView];
         [containerView bringSubviewToFront:fromView];
 
-        if (![self isPriorToIOS8]) {
-            toView.layer.transform = CATransform3DMakeScale(self.behindViewScale, self.behindViewScale, 1.0);
-        }
-
+        toView.layer.transform = CATransform3DMakeScale(self.behindViewScale, self.behindViewScale, 1.0);
         toView.alpha = self.behindViewAlpha;
 
         CGRect endRect;
@@ -288,10 +285,8 @@ void ZFTransitionViewsFromContext(id<UIViewControllerContextTransitioning> trans
     
 	[toViewController beginAppearanceTransition:YES animated:YES];
 
-    if (![self isPriorToIOS8]) {
-        toView.layer.transform = CATransform3DMakeScale(self.behindViewScale, self.behindViewScale, 1.0);
-    }
-
+    toView.layer.transform = CATransform3DMakeScale(self.behindViewScale, self.behindViewScale, 1.0);
+    
     toView.alpha = self.behindViewAlpha;
     [[transitionContext containerView] addSubview:toView];
     [[transitionContext containerView] bringSubviewToFront:fromView];
