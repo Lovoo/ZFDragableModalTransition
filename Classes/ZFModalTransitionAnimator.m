@@ -153,6 +153,9 @@ void ZFTransitionViewsFromContext(id<UIViewControllerContextTransitioning> trans
                                                                       CGRectGetHeight(toView.frame));
 
                          } completion:^(BOOL finished) {
+                             fromView.transform = CGAffineTransformIdentity;
+                             fromView.alpha = 1.0;
+                             
                              [fromViewController endAppearanceTransition];
                              [transitionContext completeTransition:![transitionContext transitionWasCancelled]];
                          }];
