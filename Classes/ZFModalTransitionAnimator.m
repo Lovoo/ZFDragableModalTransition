@@ -223,48 +223,57 @@ void ZFTransitionViewsFromContext(id<UIViewControllerContextTransitioning> trans
     CGPoint velocity = [recognizer velocityInView:[self.modalController.view window]];
     velocity = CGPointApplyAffineTransform(velocity, CGAffineTransformInvert(recognizer.view.transform));
 
-    if (recognizer.state == UIGestureRecognizerStateBegan) {
-        self.isInteractive = YES;
-        if (self.direction == ZFModalTransitonDirectionBottom) {
-            self.panLocationStart = location.y;
-        } else {
-            self.panLocationStart = location.x;
-        }
-        [self.modalController dismissViewControllerAnimated:YES completion:nil];
-        
-    } else if (recognizer.state == UIGestureRecognizerStateChanged) {
-        CGFloat animationRatio = 0;
-
-        if (self.direction == ZFModalTransitonDirectionBottom) {
-            animationRatio = (location.y - self.panLocationStart) / (CGRectGetHeight([self.modalController view].bounds));
-        } else if (self.direction == ZFModalTransitonDirectionLeft) {
-            animationRatio = (self.panLocationStart - location.x) / (CGRectGetWidth([self.modalController view].bounds));
-        } else if (self.direction == ZFModalTransitonDirectionRight) {
-            animationRatio = (location.x - self.panLocationStart) / (CGRectGetWidth([self.modalController view].bounds));
-        }
-
-        [self updateInteractiveTransition:animationRatio];
-        
-    } else if (recognizer.state == UIGestureRecognizerStateEnded) {
-
-        CGFloat velocityForSelectedDirection;
-
-        if (self.direction == ZFModalTransitonDirectionBottom) {
-            velocityForSelectedDirection = velocity.y;
-        } else {
-            velocityForSelectedDirection = velocity.x;
-        }
-
-        if (velocityForSelectedDirection > 100
-            && (self.direction == ZFModalTransitonDirectionRight
-                || self.direction == ZFModalTransitonDirectionBottom)) {
-                [self finishInteractiveTransition];
-            } else if (velocityForSelectedDirection < -100 && self.direction == ZFModalTransitonDirectionLeft) {
-                [self finishInteractiveTransition];
+    switch (recognizer.state) {
+        case UIGestureRecognizerStateBegan: {
+            self.isInteractive = YES;
+            if (self.direction == ZFModalTransitonDirectionBottom) {
+                self.panLocationStart = location.y;
             } else {
-                [self cancelInteractiveTransition];
+                self.panLocationStart = location.x;
             }
-        self.isInteractive = NO;
+            [self.modalController dismissViewControllerAnimated:YES completion:nil];
+            break;
+        }
+        case UIGestureRecognizerStateChanged: {
+            CGFloat animationRatio = 0;
+            
+            if (self.direction == ZFModalTransitonDirectionBottom) {
+                animationRatio = (location.y - self.panLocationStart) / (CGRectGetHeight([self.modalController view].bounds));
+            } else if (self.direction == ZFModalTransitonDirectionLeft) {
+                animationRatio = (self.panLocationStart - location.x) / (CGRectGetWidth([self.modalController view].bounds));
+            } else if (self.direction == ZFModalTransitonDirectionRight) {
+                animationRatio = (location.x - self.panLocationStart) / (CGRectGetWidth([self.modalController view].bounds));
+            }
+            
+            [self updateInteractiveTransition:animationRatio];
+            break;
+        }
+        case UIGestureRecognizerStateEnded:
+        case UIGestureRecognizerStateCancelled:
+        case UIGestureRecognizerStateFailed: {
+            CGFloat velocityForSelectedDirection;
+            
+            if (self.direction == ZFModalTransitonDirectionBottom) {
+                velocityForSelectedDirection = velocity.y;
+            } else {
+                velocityForSelectedDirection = velocity.x;
+            }
+            
+            if (velocityForSelectedDirection > 100
+                && (self.direction == ZFModalTransitonDirectionRight
+                    || self.direction == ZFModalTransitonDirectionBottom)) {
+                    [self finishInteractiveTransition];
+                } else if (velocityForSelectedDirection < -100 && self.direction == ZFModalTransitonDirectionLeft) {
+                    [self finishInteractiveTransition];
+                } else {
+                    [self cancelInteractiveTransition];
+                }
+            self.isInteractive = NO;
+            break;
+        }
+        default: {
+            break;
+        }
     }
 }
 
