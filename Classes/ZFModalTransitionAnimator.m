@@ -136,8 +136,6 @@ void ZFTransitionViewsFromContext(id<UIViewControllerContextTransitioning> trans
         CGPoint transformedPoint = CGPointApplyAffineTransform(startRect.origin, toView.transform);
         toView.frame = CGRectMake(transformedPoint.x, transformedPoint.y, startRect.size.width, startRect.size.height);
 
-        [fromViewController beginAppearanceTransition:NO animated:YES];
-
         [UIView animateWithDuration:[self transitionDuration:transitionContext]
                               delay:0
              usingSpringWithDamping:0.8
@@ -155,8 +153,7 @@ void ZFTransitionViewsFromContext(id<UIViewControllerContextTransitioning> trans
                          } completion:^(BOOL finished) {
                              fromView.transform = CGAffineTransformIdentity;
                              fromView.alpha = 1.0;
-                             
-                             [fromViewController endAppearanceTransition];
+
                              [transitionContext completeTransition:![transitionContext transitionWasCancelled]];
                          }];
     } else {
@@ -189,8 +186,6 @@ void ZFTransitionViewsFromContext(id<UIViewControllerContextTransitioning> trans
         CGPoint transformedPoint = CGPointApplyAffineTransform(endRect.origin, fromView.transform);
         endRect = CGRectMake(transformedPoint.x, transformedPoint.y, endRect.size.width, endRect.size.height);
 
-        [toViewController beginAppearanceTransition:YES animated:YES];
-
         [UIView animateWithDuration:[self transitionDuration:transitionContext]
                               delay:0
              usingSpringWithDamping:0.8
@@ -201,8 +196,6 @@ void ZFTransitionViewsFromContext(id<UIViewControllerContextTransitioning> trans
                              toView.alpha = 1.0f;
                              fromView.frame = endRect;
                          } completion:^(BOOL finished) {
-                             
-                             [toViewController endAppearanceTransition];
                              
                              [transitionContext completeTransition:![transitionContext transitionWasCancelled]];
 
@@ -286,9 +279,7 @@ void ZFTransitionViewsFromContext(id<UIViewControllerContextTransitioning> trans
     UIView *fromView, *toView;
     ZFTransitionViewsFromContext(transitionContext, &fromView, &toView);
     
-	[toViewController beginAppearanceTransition:YES animated:YES];
-
-    toView.layer.transform = CATransform3DMakeScale(self.behindViewScale, self.behindViewScale, 1.0);
+	toView.layer.transform = CATransform3DMakeScale(self.behindViewScale, self.behindViewScale, 1.0);
     
     toView.alpha = self.behindViewAlpha;
     [[transitionContext containerView] addSubview:toView];
@@ -347,8 +338,6 @@ void ZFTransitionViewsFromContext(id<UIViewControllerContextTransitioning> trans
 {
     id<UIViewControllerContextTransitioning> transitionContext = self.transitionContext;
 
-    UIViewController *toViewController = [transitionContext viewControllerForKey:UITransitionContextToViewControllerKey];
-
     UIView *fromView, *toView;
     ZFTransitionViewsFromContext(transitionContext, &fromView, &toView);
 
@@ -384,7 +373,6 @@ void ZFTransitionViewsFromContext(id<UIViewControllerContextTransitioning> trans
                          toView.alpha = 1.0f;
                          fromView.frame = endRect;
                      } completion:^(BOOL finished) {
-						 [toViewController endAppearanceTransition];
                          [transitionContext completeTransition:YES];
                      }];
 }
@@ -397,8 +385,6 @@ void ZFTransitionViewsFromContext(id<UIViewControllerContextTransitioning> trans
 
     UIView *fromView, *toView;
     ZFTransitionViewsFromContext(transitionContext, &fromView, &toView);
-
-    [toViewController beginAppearanceTransition:NO animated:YES];
 
     [UIView animateWithDuration:0.4
                           delay:0
@@ -414,7 +400,6 @@ void ZFTransitionViewsFromContext(id<UIViewControllerContextTransitioning> trans
                                                                     CGRectGetHeight(fromView.frame));
 
                      } completion:^(BOOL finished) {
-						 [toViewController endAppearanceTransition];
                          [transitionContext completeTransition:NO];
                          [toView removeFromSuperview];
                      }];
