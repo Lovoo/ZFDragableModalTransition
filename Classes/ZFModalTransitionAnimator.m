@@ -14,7 +14,6 @@
 @property CGFloat panLocationStart;
 @property BOOL isDismiss;
 @property BOOL isInteractive;
-@property CATransform3D tempTransform;
 @end
 
 void ZFTransitionViewsFromContext(id<UIViewControllerContextTransitioning> transitionContext, UIView **fromView, UIView **toView)
@@ -146,7 +145,7 @@ void ZFTransitionViewsFromContext(id<UIViewControllerContextTransitioning> trans
                             options:UIViewAnimationOptionCurveEaseOut
                          animations:^{
 
-                             fromView.transform = CGAffineTransformScale(fromView.transform, self.behindViewScale, self.behindViewScale);
+                             fromView.transform = CGAffineTransformMakeScale(self.behindViewScale, self.behindViewScale);
                              fromView.alpha = self.behindViewAlpha;
 
                              toView.frame = CGRectMake(0,0,
@@ -163,7 +162,7 @@ void ZFTransitionViewsFromContext(id<UIViewControllerContextTransitioning> trans
         [containerView bringSubviewToFront:fromView];
 
         if (![self isPriorToIOS8]) {
-            toView.layer.transform = CATransform3DScale(toView.layer.transform, self.behindViewScale, self.behindViewScale, 1);
+            toView.layer.transform = CATransform3DMakeScale(self.behindViewScale, self.behindViewScale, 1.0);
         }
 
         toView.alpha = self.behindViewAlpha;
@@ -198,8 +197,7 @@ void ZFTransitionViewsFromContext(id<UIViewControllerContextTransitioning> trans
               initialSpringVelocity:0.1
                             options:UIViewAnimationOptionCurveEaseOut
                          animations:^{
-                             CGFloat scaleBack = (1 / self.behindViewScale);
-                             toView.layer.transform = CATransform3DScale(toView.layer.transform, scaleBack, scaleBack, 1);
+                             toView.layer.transform = CATransform3DIdentity;
                              toView.alpha = 1.0f;
                              fromView.frame = endRect;
                          } completion:^(BOOL finished) {
@@ -291,10 +289,8 @@ void ZFTransitionViewsFromContext(id<UIViewControllerContextTransitioning> trans
 	[toViewController beginAppearanceTransition:YES animated:YES];
 
     if (![self isPriorToIOS8]) {
-        toView.layer.transform = CATransform3DScale(toView.layer.transform, self.behindViewScale, self.behindViewScale, 1);
+        toView.layer.transform = CATransform3DMakeScale(self.behindViewScale, self.behindViewScale, 1.0);
     }
-
-    self.tempTransform = toView.layer.transform;
 
     toView.alpha = self.behindViewAlpha;
     [[transitionContext containerView] addSubview:toView];
@@ -312,10 +308,8 @@ void ZFTransitionViewsFromContext(id<UIViewControllerContextTransitioning> trans
     UIView *fromView, *toView;
     ZFTransitionViewsFromContext(transitionContext, &fromView, &toView);
     
-    CATransform3D transform = CATransform3DMakeScale(
-                                                     1 + (((1 / self.behindViewScale) - 1) * percentComplete),
-                                                     1 + (((1 / self.behindViewScale) - 1) * percentComplete), 1);
-    toView.layer.transform = CATransform3DConcat(self.tempTransform, transform);
+    CGFloat scale = ((1 - self.behindViewScale) * percentComplete) + self.behindViewScale;
+    toView.layer.transform = CATransform3DMakeScale(scale,scale,1.0);
 
     toView.alpha = self.behindViewAlpha + ((1 - self.behindViewAlpha) * percentComplete);
 
@@ -388,8 +382,7 @@ void ZFTransitionViewsFromContext(id<UIViewControllerContextTransitioning> trans
           initialSpringVelocity:0.1
                         options:UIViewAnimationOptionCurveEaseOut
                      animations:^{
-                         CGFloat scaleBack = (1 / self.behindViewScale);
-                         toView.layer.transform = CATransform3DScale(self.tempTransform, scaleBack, scaleBack, 1);
+                         toView.layer.transform = CATransform3DIdentity;
                          toView.alpha = 1.0f;
                          fromView.frame = endRect;
                      } completion:^(BOOL finished) {
@@ -415,8 +408,7 @@ void ZFTransitionViewsFromContext(id<UIViewControllerContextTransitioning> trans
           initialSpringVelocity:0.1
                         options:UIViewAnimationOptionCurveEaseOut
                      animations:^{
-
-                         toView.layer.transform = self.tempTransform;
+                         toView.layer.transform = CATransform3DMakeScale(self.behindViewScale, self.behindViewScale, 1.0);
                          toView.alpha = self.behindViewAlpha;
 
                          fromView.frame = CGRectMake(0,0,
@@ -497,7 +489,7 @@ void ZFTransitionViewsFromContext(id<UIViewControllerContextTransitioning> trans
     UIViewController *backViewController = self.modalController.presentingViewController;
     backViewController.view.bounds = backViewController.view.window.bounds;
     if (![self isPriorToIOS8]) {
-        backViewController.view.layer.transform = CATransform3DScale(backViewController.view.layer.transform, self.behindViewScale, self.behindViewScale, 1);
+        backViewController.view.layer.transform = CATransform3DMakeScale(self.behindViewScale, self.behindViewScale, 1.0);
     }
 }
 
