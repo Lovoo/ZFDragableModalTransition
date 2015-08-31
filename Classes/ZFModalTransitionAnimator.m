@@ -46,20 +46,8 @@ void ZFTransitionViewsFromContext(id<UIViewControllerContextTransitioning> trans
         _behindViewScale = 0.9f;
         _behindViewAlpha = 1.0f;
         _transitionDuration = 0.8f;
-
-        [[UIDevice currentDevice] beginGeneratingDeviceOrientationNotifications];
-        [[NSNotificationCenter defaultCenter] addObserver:self
-                                                 selector:@selector(orientationChanged:)
-                                                     name:UIApplicationDidChangeStatusBarFrameNotification
-                                                   object:nil];
     }
     return self;
-}
-
--(void)dealloc
-{
-    [[NSNotificationCenter defaultCenter] removeObserver:self];
-    [[UIDevice currentDevice] endGeneratingDeviceOrientationNotifications];
 }
 
 - (void)setDragable:(BOOL)dragable
@@ -451,29 +439,6 @@ void ZFTransitionViewsFromContext(id<UIViewControllerContextTransitioning> trans
         return YES;
     }
     return NO;
-}
-
-#pragma mark - Utils
-
-- (BOOL)isPriorToIOS8
-{
-    NSComparisonResult order = [[UIDevice currentDevice].systemVersion compare: @"8.0" options: NSNumericSearch];
-    if (order == NSOrderedSame || order == NSOrderedDescending) {
-        // OS version >= 8.0
-        return YES;
-    }
-    return NO;
-}
-
-#pragma mark - Orientation
-
-- (void)orientationChanged:(NSNotification *)notification
-{
-    UIViewController *backViewController = self.modalController.presentingViewController;
-    backViewController.view.bounds = backViewController.view.window.bounds;
-    if (![self isPriorToIOS8]) {
-        backViewController.view.layer.transform = CATransform3DMakeScale(self.behindViewScale, self.behindViewScale, 1.0);
-    }
 }
 
 @end
